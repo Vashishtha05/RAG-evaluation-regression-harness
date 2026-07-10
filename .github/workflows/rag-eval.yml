@@ -1,0 +1,54 @@
+name: RAG quality gate
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: python -m rag_eval.cli validate-dataset
+      - run: pytest -q
+      - name: Evaluate RAG quality
+        id: rag-eval
+        continue-on-error: true
+        if: github.event_name == 'pull_request'
+        run: python -m rag_eval.cli evaluate --store results.sqlite3 --run-id ci-pr --baseline-file data/baseline-pr.json --threshold 0.05 --verified-only --limit 10 --report-file rag-quality-report.md
+      - name: Evaluate full golden set nightly
+        id: nightly-eval
+        if: github.event_name == 'schedule'
+        continue-on-error: true
+        run: python -m rag_eval.cli evaluate --store results.sqlite3 --run-id ci-nightly --baseline-file data/baseline.json --threshold 0.05 --report-file rag-quality-report.md
+      - name: Comment score diff on pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('rag-quality-report.md', 'utf8');
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            const marker = '## RAG quality report';
+            const existing = comments.find(comment => comment.body.startsWith(marker) && comment.user.type === 'Bot');
+            if (existing) {
+              await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
+            }
+      - name: Enforce quality gate
+        if: steps.rag-eval.outcome == 'failure' || steps.nightly-eval.outcome == 'failure'
+        run: exit 1
