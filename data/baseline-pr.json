@@ -1,0 +1,12 @@
+{
+  "run_id": "constitution-baseline-pr-v1",
+  "config_hash": "offline-default",
+  "aggregate_scores": {
+    "retrieval_precision": 0.18,
+    "retrieval_recall": 0.9,
+    "retrieval_mrr": 0.85,
+    "faithfulness": 1.0,
+    "answer_relevance": 0.966,
+    "correctness": 0.442
+  }
+}

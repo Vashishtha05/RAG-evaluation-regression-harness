@@ -1,0 +1,22 @@
+[
+  {"case_id":"constitution-001","faithful":true,"relevant":true},
+  {"case_id":"constitution-002","faithful":true,"relevant":true},
+  {"case_id":"constitution-003","faithful":true,"relevant":true},
+  {"case_id":"constitution-004","faithful":true,"relevant":true},
+  {"case_id":"constitution-005","faithful":true,"relevant":true},
+  {"case_id":"constitution-006","faithful":true,"relevant":true},
+  {"case_id":"constitution-007","faithful":true,"relevant":true},
+  {"case_id":"constitution-008","faithful":true,"relevant":true},
+  {"case_id":"constitution-009","faithful":true,"relevant":true},
+  {"case_id":"constitution-010","faithful":true,"relevant":true},
+  {"case_id":"constitution-011","faithful":true,"relevant":true},
+  {"case_id":"constitution-012","faithful":true,"relevant":true},
+  {"case_id":"constitution-013","faithful":true,"relevant":true},
+  {"case_id":"constitution-014","faithful":true,"relevant":true},
+  {"case_id":"constitution-015","faithful":true,"relevant":true},
+  {"case_id":"constitution-016","faithful":true,"relevant":true},
+  {"case_id":"calibration-017","query":"What is the federal voting age?","context":"Article I, Section 1: All legislative Powers herein granted shall be vested in a Congress of the United States.","answer":"The Constitution sets the federal voting age at sixteen.","faithful":false,"relevant":true},
+  {"case_id":"calibration-018","query":"How long is the President's term?","context":"Article I, Section 3: The Senate of the United States shall be composed of two Senators from each State.","answer":"Each state has two senators.","faithful":true,"relevant":false},
+  {"case_id":"calibration-019","query":"Who is the current President?","context":"Article II, Section 1: The executive Power shall be vested in a President of the United States.","answer":"The current President is named in Article II as Alex Example.","faithful":false,"relevant":true},
+  {"case_id":"calibration-020","query":"What does the Fourth Amendment protect?","context":"Article VII: The Ratification of the Conventions of nine States, shall be sufficient for the Establishment of this Constitution.","answer":"The Senate has two members from each state.","faithful":false,"relevant":false}
+]
