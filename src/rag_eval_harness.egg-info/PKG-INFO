@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: rag-eval-harness
+Version: 0.1.0
+Summary: A regression harness for measuring retrieval and generation quality in RAG systems.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Provides-Extra: runtime
+Requires-Dist: numpy>=1.26; extra == "runtime"
+Requires-Dist: scikit-learn>=1.4; extra == "runtime"
+Provides-Extra: vector
+Requires-Dist: faiss-cpu>=1.8; extra == "vector"
+Provides-Extra: llm
+Requires-Dist: openai>=1.30; extra == "llm"
+Provides-Extra: dashboard
+Requires-Dist: streamlit>=1.35; extra == "dashboard"
+Requires-Dist: plotly>=5.22; extra == "dashboard"
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: ruff>=0.5; extra == "dev"
+
+# RAG Evaluation & Regression Harness
+
+This project treats RAG quality as a testable software contract. It keeps **retrieval scores** separate from **generation scores**, so a failing answer can be diagnosed as a retrieval problem or a generation problem.
+
+## Build order
+
+1. Golden dataset: verified questions, retrieval labels, expected answers, and source context.
+2. Swappable RAG pipeline: chunking, embeddings, vector store, retrieval, and generation behind interfaces.
+3. Deterministic retrieval metrics: Precision@k, Recall@k, and MRR.
+4. LLM judges: faithfulness, answer relevance, and hybrid correctness.
+5. Judge calibration against human labels.
+6. SQLite results store.
+7. Baselines, diffs, thresholds, and regression gates.
+8. Pull-request CI gate and nightly full evaluation.
+9. Streamlit dashboard.
+
+## Quick start
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[runtime,dev]"
+pytest
+python -m rag_eval.cli validate-dataset
+```
+
+The initial corpus is the public-domain Constitution of the United States. The golden set contains factual questions, multi-chunk questions, and deliberately unanswerable questions. `verified` marks the trustworthy human-reviewed core; future generated candidates must not be promoted into that subset without review.
+
+To run the quality gate locally, persist the candidate run, and write a Markdown report:
+
+```powershell
+python -m rag_eval.cli evaluate --store results.sqlite3 --run-id local --baseline-file data/baseline.json --threshold 0.05 --report-file rag-quality-report.md
+```
+
+Use `--vector-store vector` for the deterministic embedding backend, `--vector-store faiss` after installing `.[vector]`, or `--llm openai:gpt-4o-mini --embedding-model openai:text-embedding-3-small` with an OpenAI key. Prompt templates are selected with `--prompt-template`. Pull requests evaluate 10 verified cases; the scheduled workflow evaluates the complete golden set.
+
+## Project layout
+
+- `data/corpus/`: source documents and chunk manifests.
+- `data/golden.json`: versioned evaluation cases.
+- `src/rag_eval/`: the package, built component by component.
+- `tests/`: focused checks for each component.
+- `.github/workflows/`: fast pull-request evaluation and full nightly evaluation.
