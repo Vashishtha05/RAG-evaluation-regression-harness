@@ -484,8 +484,3 @@ This provides a fast development feedback loop while retaining a comprehensive s
 
 Released under the **MIT License**.
 
-See:
-
-```text
-LICENSE
-```
